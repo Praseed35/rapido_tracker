@@ -57,7 +57,7 @@ DATABASES = {
     }
 }
 database_url=os.environ.get("DATABASE_URL")
-DATABASES['default']=dj_database_url.parse("postgresql://rapido_tracker_user:E8D1FfnnhIz7cSywsIxP6hDr8ItyRIIU@dpg-d22t1hbe5dus73a0el90-a.oregon-postgres.render.com/rapido_tracker")
+DATABASES['default']=dj_database_url.parse("database_url")
 
 
 AUTH_PASSWORD_VALIDATORS = [
