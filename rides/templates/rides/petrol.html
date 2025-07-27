@@ -1,0 +1,32 @@
+{% extends 'rides/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Update Petrol Expense for {{ form.date.value|date:"F j, Y" }}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="date" value="{{ form.date.value }}">
+                        <div class="mb-3">
+                            <label for="id_petrol_expense" class="form-label">Petrol Expense</label>
+                            {{ form.petrol_expense }}
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'dashboard' %}?date={{ form.date.value|date:'Y-m-d' }}" 
+                               class="btn btn-secondary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

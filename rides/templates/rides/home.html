@@ -1,0 +1,68 @@
+{% extends 'rides/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1>Ride Tracker</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <form method="get" class="d-inline">
+                <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" 
+                       class="form-control d-inline-block w-auto" onchange="this.form.submit()">
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Add New Ride</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'add_ride' %}?date={{ selected_date|date:'Y-m-d' }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+                        <div class="mb-3">
+                            <label class="form-label">Earning</label>
+                            <input type="number" name="earning" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Commission</label>
+                            <input type="number" name="commission" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Ride</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Update Petrol Expense</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'update_petrol' %}?date={{ selected_date|date:'Y-m-d' }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+                        <div class="mb-3">
+                            <label class="form-label">Amount</label>
+                            <input type="number" name="petrol_expense" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'dashboard' %}?date={{ selected_date|date:'Y-m-d' }}" 
+           class="btn btn-success btn-lg">
+            View Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,251 @@
+{% extends 'rides/base.html' %}
+
+{% block content %}
+<div class="container">
+    <!-- Date Selection and Header -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h1 class="mb-0">
+                <i class="bi bi-speedometer2"></i> Ride Dashboard
+                <small class="text-muted d-block d-md-inline mt-2 mt-md-0">
+                    {{ selected_date|date:"F j, Y" }}
+                    {% if selected_date != current_date %}
+                    <span class="badge bg-warning text-dark ms-2">Viewing Past Date</span>
+                    {% endif %}
+                </small>
+            </h1>
+        </div>
+        <div class="col-md-6">
+            <div class="d-flex justify-content-md-end">
+                <form method="get" class="me-2">
+                    <input type="date" name="date" value="{{ selected_date|date:'Y-m-d' }}" 
+                           class="form-control {% if selected_date != current_date %}border-warning{% endif %}" 
+                           onchange="this.form.submit()">
+                </form>
+                {% if selected_date != current_date %}
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary align-self-center" 
+                   title="Go to today">
+                    Today
+                </a>
+                {% endif %}
+                <span class="d-none d-md-block text-muted align-self-center ms-3">
+                    <i class="bi bi-clock"></i> <span id="current-time"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="row mb-3">
+        <div class="col-12">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Stats Cards -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-primary">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">Total Earnings</h5>
+                    <p class="card-text display-6 text-primary">₹{{ daily_record.total_earnings }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-secondary">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-secondary">Total Commission</h5>
+                    <p class="card-text display-6 text-secondary">₹{{ daily_record.total_commission }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-dark">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-dark">Petrol Expense</h5>
+                    <p class="card-text display-6 text-dark">₹{{ daily_record.petrol_expense }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">Final Savings</h5>
+                    <p class="card-text display-6 text-success">₹{{ daily_record.final_savings }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Ride Form -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="bi bi-plus-circle"></i> Add New Ride
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{% url 'add_ride' %}?date={{ selected_date|date:'Y-m-d' }}" id="add-ride-form">
+                {% csrf_token %}
+                <input type="hidden" name="device_time" id="device-time-field">
+                
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label">Earning (₹)</label>
+                        <input type="number" name="earning" class="form-control" step="0.01" min="0" required>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Commission (₹)</label>
+                        <input type="number" name="commission" class="form-control" step="0.01" min="0" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check-lg"></i> Add
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ride List -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="bi bi-list-ul"></i> Ride Details
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            {% if rides %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Time</th>
+                            <th class="text-end">Earning</th>
+                            <th class="text-end">Commission</th>
+                            <th class="text-end">Savings</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ride in rides %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <span class="local-time" data-iso="{{ ride.device_time|date:'c' }}">
+                                    {{ ride.device_time|time }}
+                                </span>
+                            </td>
+                            <td class="text-end">₹{{ ride.earning }}</td>
+                            <td class="text-end">₹{{ ride.commission }}</td>
+                            <td class="text-end">₹{{ ride.savings }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'edit_ride' ride.id %}?date={{ selected_date|date:'Y-m-d' }}" class="btn btn-outline-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'delete_ride' ride.id %}?date={{ selected_date|date:'Y-m-d' }}" class="btn btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4 text-muted">
+                <i class="bi bi-info-circle fs-1"></i>
+                <p class="mt-2 mb-0">No rides recorded for this date</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Petrol Expense Form -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="bi bi-fuel-pump"></i> Petrol Expense
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{% url 'update_petrol' %}?date={{ selected_date|date:'Y-m-d' }}">
+                {% csrf_token %}
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-10">
+                        <label class="form-label">Amount (₹)</label>
+                        <input type="number" name="petrol_expense" 
+                               value="{{ daily_record.petrol_expense }}" 
+                               class="form-control" step="0.01" min="0" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-dark w-100">
+                            <i class="bi bi-save"></i> Update
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Update current time display
+function updateCurrentTime() {
+    const now = new Date();
+    document.getElementById('current-time').textContent = now.toLocaleTimeString();
+}
+setInterval(updateCurrentTime, 1000);
+updateCurrentTime();
+
+// Format all ride timestamps on page load
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.local-time').forEach(el => {
+        const isoTime = el.getAttribute('data-iso');
+        if (isoTime) {
+            const time = new Date(isoTime);
+            el.textContent = time.toLocaleTimeString([], {
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+    });
+    
+    // Ensure all links maintain the date parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentDate = urlParams.get('date');
+    
+    if (currentDate) {
+        // Update all form actions that don't already have a date
+        document.querySelectorAll('form').forEach(form => {
+            const action = form.getAttribute('action');
+            if (action && !action.includes('date=')) {
+                form.setAttribute('action', `${action}?date=${currentDate}`);
+            }
+        });
+    }
+});
+
+// Set device time when adding a ride
+document.getElementById('add-ride-form').addEventListener('submit', function() {
+    const now = new Date();
+    document.getElementById('device-time-field').value = now.toISOString();
+    return true;
+});
+</script>
+{% endblock %}
