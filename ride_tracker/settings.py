@@ -1,13 +1,14 @@
 import os
 from pathlib import Path
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-your-secret-key-here'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
-DEBUG = True
+DEBUG = os.environ.get("DEBUG","False").lower()=="true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -55,6 +56,9 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+database_url=os.environ.get("DATABASE_URL")
+DATABASES['default']=dj_database_url.parse("postgresql://rapido_tracker_user:E8D1FfnnhIz7cSywsIxP6hDr8ItyRIIU@dpg-d22t1hbe5dus73a0el90-a.oregon-postgres.render.com/rapido_tracker")
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
