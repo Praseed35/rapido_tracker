@@ -101,7 +101,6 @@ def update_petrol(request):
         selected_date = timezone.now().date()
     
     if request.method == 'POST':
-        # Get or create daily record
         daily_record, created = DailyRecord.objects.get_or_create(
             user=request.user,
             date=selected_date,
@@ -183,7 +182,7 @@ def user_signup(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('dashboard')
+            return redirect('home')
     else:
         form = SignUpForm()
     
