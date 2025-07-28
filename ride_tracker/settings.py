@@ -4,11 +4,11 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = 'django-insecure-your-secret-key-here'
 
-DEBUG = os.environ.get("DEBUG","False").lower()=="true"
+DEBUG =  True#os.environ.get("DEBUG","False").lower()=="true"
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -51,13 +51,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ride_tracker.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse(
+        "postgresql://rapido_tracker_m4my_user:QoNKe4I8acN3nWmqvHcbiosyNtu0zd8n@dpg-d22usmh5pdvs739csf3g-a.oregon-postgres.render.com/rapido_tracker_m4my?sslmode=require"
+    )
 }
-database_url=os.environ.get("DATABASE_URL")
-DATABASES['default']=dj_database_url.parse("postgresql://rapido_tracker_user:E8D1FfnnhIz7cSywsIxP6hDr8ItyRIIU@dpg-d22t1hbe5dus73a0el90-a.oregon-postgres.render.com/rapido_tracker")
+
+#DATABASES['default']=dj_database_url.parse("postgresql://rapido_tracker_user:E8D1FfnnhIz7cSywsIxP6hDr8ItyRIIU@dpg-d22t1hbe5dus73a0el90-a.oregon-postgres.render.com/rapido_tracker")
 
 
 AUTH_PASSWORD_VALIDATORS = [
