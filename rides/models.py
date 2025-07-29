@@ -53,10 +53,10 @@ class Ride(models.Model):
     earning = models.DecimalField(max_digits=10, decimal_places=2)
     commission = models.DecimalField(max_digits=10, decimal_places=2)
     device_time = models.DateTimeField(null=True, blank=True)  # New field for device time
-    timestamp = models.DateTimeField(auto_now_add=False)  # Keep server time for reference
+    timestamp = models.DateTimeField(auto_now_add=True)  # Keep server time for reference
     
     class Meta:
-        ordering = ['timestamp']  # Or 'id' if you prefer
+        ordering = ['-timestamp']  # Or 'id' if you prefer
         
     def __str__(self):
         return f"Ride on {self.timestamp}"
